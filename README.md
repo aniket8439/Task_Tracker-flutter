@@ -9,7 +9,7 @@ This project is a starting point for a Flutter application.
 
 Setting Up the Project:
 1. Clone the project repository from GitHub:
-   git clone https://github.com/your-username/task_manager.git
+   git clone https://github.com/aniket8439/task_manager.git
    
 2. Navigate to the project directory:
    cd task_manager

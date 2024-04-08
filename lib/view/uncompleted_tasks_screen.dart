@@ -16,10 +16,17 @@ class UncompletedTasksScreen extends StatefulWidget {
 }
 
 class _UncompletedTasksScreenState extends State<UncompletedTasksScreen> {
+  List<Task> uncompletedTasks =
+      []; //Initialise it here to maintain state of the List
+
+  @override
+  void initState() {
+    super.initState();
+    uncompletedTasks = widget.tasks.where((task) => !task.isCompleted).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final uncompletedTasks = widget.tasks.where((task) => !task.isCompleted).toList();
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -28,10 +35,7 @@ class _UncompletedTasksScreenState extends State<UncompletedTasksScreen> {
           child: Text(
             'Uncompleted Tasks',
             style: TextStyle(
-              fontWeight: FontWeight.w900,
-              fontSize: 30,
-              color: Colors.red
-            ),
+                fontWeight: FontWeight.w900, fontSize: 30, color: Colors.red),
           ),
         ),
         Expanded(
@@ -54,7 +58,8 @@ class _UncompletedTasksScreenState extends State<UncompletedTasksScreen> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Checkbox(
-                        value: false,
+                        value: task
+                            .isCompleted, //use directly task.isCompleted for checkbox
                         onChanged: (newValue) {
                           _markTaskCompleted(context, task);
                         },
@@ -86,7 +91,8 @@ class _UncompletedTasksScreenState extends State<UncompletedTasksScreen> {
     if (editedTask != null) {
       setState(() {
         // replace the edited task with the original task
-        widget.tasks[widget.tasks.indexWhere((element) => element == task)] = editedTask;
+        widget.tasks[widget.tasks.indexWhere((element) => element == task)] =
+            editedTask;
       });
     }
   }
@@ -95,15 +101,22 @@ class _UncompletedTasksScreenState extends State<UncompletedTasksScreen> {
     setState(() {
       task.isCompleted = true;
     });
-    _saveTasks();
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text('Task marked as completed'),
-    ));
+    //Here i added delay to get UI effect.
+    Future.delayed(Duration(milliseconds: 500), () {
+      setState(() {
+        uncompletedTasks.remove(task);
+        _saveTasks();
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Task marked as completed'),
+        ));
+      });
+    });
   }
 
   void _saveTasks() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    List<String> tasksJson = widget.tasks.map((task) => json.encode(task.toJson())).toList();
+    List<String> tasksJson =
+        widget.tasks.map((task) => json.encode(task.toJson())).toList();
     prefs.setStringList('tasks', tasksJson);
   }
 }
