@@ -48,7 +48,8 @@ class _TaskControllerState extends State<TaskController> {
 
   void _addTask(Task task) {
     setState(() {
-      _tasks.insert(_tasks.length - 1, task); // Inserts the task before the last one (the "Add Task" button)
+    _tasks.add(
+          task); //here you can simply add so that you can ditch range Error
       _saveTasks();
     });
   }
